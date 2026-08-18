@@ -10,9 +10,10 @@
 
 ```
 firmware/          ESP32 固件（PlatformIO）
-  src/hal/         ADC 抽象接口 + ADS1220 实现
-  src/core/        采样引擎（状态机/缓冲/抽取/换挡）
+  src/app/         状态机主循环（编排）
+  src/core/        采样引擎（缓冲/抽取/换挡，纯逻辑）
   src/transport/   帧编解码 + BLE 发送
+  src/hal/         ADC 抽象接口 + ADS1220 实现
 miniprogram/       微信小程序
 docs/              需求 / 架构 / 协议 / 标定
 .github/           CI
