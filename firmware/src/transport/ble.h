@@ -17,4 +17,7 @@ bool bleNotify(const uint8_t* data, size_t len);
 // 是否有客户端已连接。
 bool bleConnected();
 
+// 注册手机写入（RX 特性）处理回调；MVP 用于切换采样率命令（FR-2 软件可切换）。
+void bleSetRxHandler(void (*handler)(const uint8_t* data, size_t len));
+
 }  // namespace transport

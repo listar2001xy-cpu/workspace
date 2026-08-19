@@ -17,6 +17,7 @@ constexpr const char* kDeviceName = "FlexSensor";
 
 bool g_connected = false;
 BLECharacteristic* g_tx = nullptr;
+void (*g_rxHandler)(const uint8_t* data, size_t len) = nullptr;
 
 // 连接/断线回调。core 3.x 中 onConnect/onDisconnect 各有 1-arg 与 2-arg 重载，
 // 栈会依次调两个；这里只覆写 2-arg 版，保证每事件只触发一次。
@@ -37,13 +38,14 @@ public:
     }
 };
 
-// 手机写入回调（M3 在此处理命令：切采样率 / 换挡等）
+// 手机写入回调：转交上层处理（切采样率等命令）
 class RxCallbacks : public BLECharacteristicCallbacks {
 public:
     void onWrite(BLECharacteristic* ch, esp_ble_gatts_cb_param_t* param) override {
         (void)ch;
-        (void)param;
-        // TODO(M3): 解析手机下发的命令
+        if (g_rxHandler && param && param->write.len > 0) {
+            g_rxHandler(param->write.value, param->write.len);
+        }
     }
 };
 
@@ -80,6 +82,10 @@ bool bleNotify(const uint8_t* data, size_t len) {
 
 bool bleConnected() {
     return g_connected;
+}
+
+void bleSetRxHandler(void (*handler)(const uint8_t* data, size_t len)) {
+    g_rxHandler = handler;
 }
 
 }  // namespace transport
